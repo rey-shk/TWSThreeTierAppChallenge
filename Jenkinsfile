@@ -78,7 +78,7 @@ pipeline {
             steps {
                 script {
                     echo "Authenticating with AWS ECR and pushing images..."
-                    withCredentials([usernamePassword(credentialsId: "${AWS_CREDS_ID}", passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "${AWS_CREDS_ID}", accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                         sh """
                             export AWS_ACCESS_KEY_ID=\${AWS_ACCESS_KEY_ID}
                             export AWS_SECRET_ACCESS_KEY=\${AWS_SECRET_ACCESS_KEY}
@@ -104,7 +104,7 @@ pipeline {
             steps {
                 script {
                     echo "Updating Kubernetes manifests and deploying to EKS cluster..."
-                    withCredentials([usernamePassword(credentialsId: "${AWS_CREDS_ID}", passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "${AWS_CREDS_ID}", accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                         sh """
                             export AWS_ACCESS_KEY_ID=\${AWS_ACCESS_KEY_ID}
                             export AWS_SECRET_ACCESS_KEY=\${AWS_SECRET_ACCESS_KEY}
