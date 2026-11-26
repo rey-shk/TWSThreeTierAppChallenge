@@ -156,20 +156,26 @@ pipeline {
             steps {
                 script {
                     echo "Verifying deployment rollouts in namespace '${K8S_NAMESPACE}'..."
-                    sh """
-                        kubectl rollout status deployment/mongodb -n ${K8S_NAMESPACE} --timeout=120s
-                        kubectl rollout status deployment/api -n ${K8S_NAMESPACE} --timeout=120s
-                        kubectl rollout status deployment/frontend -n ${K8S_NAMESPACE} --timeout=120s
+                    withCredentials([usernamePassword(credentialsId: "${AWS_CREDS_ID}", usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        sh """
+                            export AWS_ACCESS_KEY_ID=\${AWS_ACCESS_KEY_ID}
+                            export AWS_SECRET_ACCESS_KEY=\${AWS_SECRET_ACCESS_KEY}
+                            export AWS_DEFAULT_REGION=${AWS_REGION}
 
-                        echo "=== Deployed Pods ==="
-                        kubectl get pods -n ${K8S_NAMESPACE} -o wide
+                            kubectl rollout status deployment/mongodb -n ${K8S_NAMESPACE} --timeout=120s
+                            kubectl rollout status deployment/api -n ${K8S_NAMESPACE} --timeout=120s
+                            kubectl rollout status deployment/frontend -n ${K8S_NAMESPACE} --timeout=120s
 
-                        echo "=== Deployed Services ==="
-                        kubectl get svc -n ${K8S_NAMESPACE}
+                            echo "=== Deployed Pods ==="
+                            kubectl get pods -n ${K8S_NAMESPACE} -o wide
 
-                        echo "=== Deployed Ingress / Load Balancer ==="
-                        kubectl get ingress -n ${K8S_NAMESPACE} || true
-                    """
+                            echo "=== Deployed Services ==="
+                            kubectl get svc -n ${K8S_NAMESPACE}
+
+                            echo "=== Deployed Ingress / Load Balancer ==="
+                            kubectl get ingress -n ${K8S_NAMESPACE} || true
+                        """
+                    }
                 }
             }
         }
