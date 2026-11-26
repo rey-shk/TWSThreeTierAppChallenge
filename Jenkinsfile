@@ -2,6 +2,9 @@ pipeline {
     agent any
 
     environment {
+        // Ensure /usr/local/bin is in PATH for aws and kubectl
+        PATH               = "/usr/local/bin:/usr/bin:/bin:${env.PATH}"
+
         // ==========================================
         // AWS & ECR CONFIGURATION
         // ==========================================
